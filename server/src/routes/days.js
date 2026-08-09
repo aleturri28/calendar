@@ -3,7 +3,7 @@ import { db } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { isValidDate, isUploadOpen, romeDate, START_DATE } from '../lib/dates.js';
 import {
-  publicIdFor, resourceTypeFor, entryStatus, MAX_VIDEO_SECONDS,
+  publicIdFor, resourceTypeFor, serializeEntry, MAX_VIDEO_SECONDS,
 } from '../lib/days.js';
 // Import del modulo intero, non delle singole funzioni: è la forma che
 // vi.spyOn può intercettare nei test.
@@ -87,17 +87,14 @@ daysRouter.get('/:date', requireAuth, async (req, res) => {
   }
 
   const users = await db().user.findMany({ orderBy: { id: 'asc' } });
-  const entries = await db().dayEntry.findMany({ where: { date } });
+  const entries = await db().dayEntry.findMany({
+    where: { date },
+    include: { comments: { include: { user: true }, orderBy: { createdAt: 'asc' } } },
+  });
 
   const statuses = users.map((user) => {
     const entry = entries.find((e) => e.userId === user.id) ?? null;
-    return {
-      ...entryStatus(entry, user),
-      isMe: user.id === req.userId,
-      photoUrl: entry?.photoUrl ?? null,
-      videoUrl: entry?.videoUrl ?? null,
-      videoDuration: entry?.videoDuration ?? null,
-    };
+    return serializeEntry(entry, user, req.userId);
   });
 
   // L'utente corrente per primo: la sua colonna è quella su cui agisce.

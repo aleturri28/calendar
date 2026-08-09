@@ -6,6 +6,8 @@ import { existsSync } from 'node:fs';
 import { authRouter } from './routes/auth.js';
 import { daysRouter } from './routes/days.js';
 import { calendarRouter } from './routes/calendar.js';
+import { commentsRouter } from './routes/comments.js';
+import { feedRouter, timelineRouter } from './routes/stream.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const clientDist = join(here, '../../client/dist');
@@ -19,6 +21,9 @@ export function createApp() {
   app.use('/api/auth', authRouter);
   app.use('/api/days', daysRouter);
   app.use('/api/calendar', calendarRouter);
+  app.use('/api/feed', feedRouter);
+  app.use('/api/timeline', timelineRouter);
+  app.use('/api', commentsRouter);
 
   // Il 404 JSON sotto /api deve venire prima del fallback SPA, altrimenti una
   // chiamata API sbagliata riceve HTML e il client va in errore di parsing.

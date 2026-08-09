@@ -30,6 +30,19 @@ Solo 2 utenti fissi. Niente registrazione, niente feed, niente like.
 | Upload | Diretto browser → Cloudinary con firma; il server verifica a posteriori. |
 | Sessione | JWT in cookie `httpOnly`, 180 giorni. |
 
+## Aggiunte dopo l'MVP
+
+- **Commenti brevi** (max 140 caratteri) sul singolo contenuto, non sul giorno: uno sotto
+  la foto e uno sotto il video. Ognuno cancella solo i propri. Nessuna finestra temporale:
+  si può commentare anche un giorno ormai chiuso.
+- **Miniature nel calendario**: ogni cella mostra la foto dell'altro, ridimensionata da
+  Cloudinary via trasformazione nell'URL. A piena risoluzione una griglia mensile
+  scaricherebbe decine di megabyte su rete mobile.
+- **Flusso sotto il calendario**: gli ultimi 21 giorni con contenuti, l'altro per primo,
+  con gli stessi commenti della vista giorno.
+- **Striscia del tempo** (`/timeline`): tutte le foto in sequenza orizzontale con snap,
+  dal primo giorno a oggi.
+
 ## Cosa entra in questo giro
 
 Login, calendario mensile, upload foto+video con minimo impostato dall'altro, vista giorno.

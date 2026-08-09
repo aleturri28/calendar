@@ -5,6 +5,7 @@ import { api } from './api.js';
 import { Login } from './pages/Login.jsx';
 import { Month } from './pages/Month.jsx';
 import { Day } from './pages/Day.jsx';
+import { Timeline } from './pages/Timeline.jsx';
 import './styles.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Month user={user} />} />
       <Route path="/day/:date" element={<Day user={user} />} />
+      <Route path="/timeline" element={<Timeline />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

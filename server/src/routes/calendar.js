@@ -2,7 +2,7 @@ import express from 'express';
 import { db } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { isUploadOpen, romeDate, START_DATE } from '../lib/dates.js';
-import { entryStatus, dayState } from '../lib/days.js';
+import { entryStatus, dayState, thumbnailUrl, videoPosterUrl } from '../lib/days.js';
 
 export const calendarRouter = express.Router();
 
@@ -28,7 +28,12 @@ calendarRouter.get('/:month', requireAuth, async (req, res) => {
   const days = daysInMonth(month).map((date) => {
     const statuses = users.map((user) => {
       const entry = entries.find((e) => e.date === date && e.userId === user.id) ?? null;
-      return entryStatus(entry, user);
+      return {
+        ...entryStatus(entry, user),
+        isMe: user.id === req.userId,
+        // Miniatura piccola: la cella la usa come sfondo.
+        thumb: thumbnailUrl(entry?.photoUrl ?? null) ?? videoPosterUrl(entry?.videoUrl ?? null),
+      };
     });
     return {
       date,

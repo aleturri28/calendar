@@ -15,6 +15,7 @@ model User {
   name         String     @unique
   passwordHash String
   entries      DayEntry[]
+  comments     Comment[]
 }
 
 model DayEntry {
@@ -30,9 +31,24 @@ model DayEntry {
   videoDuration   Float?
   videoUploadedAt DateTime?
   createdAt       DateTime  @default(now())
+  comments        Comment[]
 
   @@unique([date, userId])
   @@index([date])
+}
+
+model Comment {
+  id         Int      @id @default(autoincrement())
+  dayEntryId Int
+  entry      DayEntry @relation(fields: [dayEntryId], references: [id], onDelete: Cascade)
+  // Quale contenuto commenta: 'photo' oppure 'video'.
+  target     String
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  text       String
+  createdAt  DateTime @default(now())
+
+  @@index([dayEntryId])
 }
 
 model Event {
