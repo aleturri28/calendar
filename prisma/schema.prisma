@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  name         String     @unique
+  passwordHash String
+  entries      DayEntry[]
+}
+
+model DayEntry {
+  id              Int       @id @default(autoincrement())
+  date            String
+  userId          Int
+  user            User      @relation(fields: [userId], references: [id])
+  minDuration     Int       @default(30)
+  photoUrl        String?
+  photoPublicId   String?
+  photoUploadedAt DateTime?
+  videoUrl        String?
+  videoPublicId   String?
+  videoDuration   Float?
+  videoUploadedAt DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@unique([date, userId])
+  @@index([date])
+}
+
+model Event {
+  id          Int     @id @default(autoincrement())
+  title       String
+  emoji       String?
+  startDate   String
+  endDate     String
+  isMeetup    Boolean @default(false)
+  createdById Int
+
+  @@index([startDate])
+}
