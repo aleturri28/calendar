@@ -3,7 +3,7 @@ import { db } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { isValidDate, isUploadOpen, romeDate, START_DATE } from '../lib/dates.js';
 import {
-  otherUserId, publicIdFor, resourceTypeFor,
+  otherUserId, publicIdFor, resourceTypeFor, entryStatus,
   MIN_SECONDS, MAX_SECONDS, DEFAULT_MIN_DURATION,
 } from '../lib/days.js';
 // Import del modulo intero, non delle singole funzioni: è la forma che
@@ -108,4 +108,30 @@ daysRouter.post('/:date/confirm', requireAuth, async (req, res) => {
   });
 
   res.json({ date, kind, url: resource.secure_url, minDuration: entry.minDuration });
+});
+
+daysRouter.get('/:date', requireAuth, async (req, res) => {
+  const { date } = req.params;
+  if (!isValidDate(date) || date < START_DATE) {
+    return res.status(400).json({ error: 'invalid_date' });
+  }
+
+  const users = await db().user.findMany({ orderBy: { id: 'asc' } });
+  const entries = await db().dayEntry.findMany({ where: { date } });
+
+  const statuses = users.map((user) => {
+    const entry = entries.find((e) => e.userId === user.id) ?? null;
+    return {
+      ...entryStatus(entry, user),
+      isMe: user.id === req.userId,
+      photoUrl: entry?.photoUrl ?? null,
+      videoUrl: entry?.videoUrl ?? null,
+      videoDuration: entry?.videoDuration ?? null,
+    };
+  });
+
+  // L'utente corrente per primo: la sua colonna è quella su cui agisce.
+  statuses.sort((x, y) => Number(y.isMe) - Number(x.isMe));
+
+  res.json({ date, isOpen: isUploadOpen(date), today: romeDate(), users: statuses });
 });
