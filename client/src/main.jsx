@@ -6,6 +6,7 @@ import { Login } from './pages/Login.jsx';
 import { Month } from './pages/Month.jsx';
 import { Day } from './pages/Day.jsx';
 import { Timeline } from './pages/Timeline.jsx';
+import { Summary } from './pages/Summary.jsx';
 import './styles.css';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
       <Route path="/" element={<Month user={user} />} />
       <Route path="/day/:date" element={<Day user={user} />} />
       <Route path="/timeline" element={<Timeline />} />
+      <Route path="/riepilogo/:month" element={<Summary />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

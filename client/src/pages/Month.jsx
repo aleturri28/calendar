@@ -5,6 +5,7 @@ import { CalendarGrid } from '../components/CalendarGrid.jsx';
 import { EntryMedia } from '../components/EntryMedia.jsx';
 import { Countdown } from '../components/Countdown.jsx';
 import { Events } from '../components/Events.jsx';
+import { News } from '../components/News.jsx';
 
 const MONTH_NAMES = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
   'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
@@ -51,10 +52,20 @@ export function Month({ user }) {
   }, [month]);
   useEffect(() => { api.get('/api/events').then(setAgenda); }, []);
 
+  const [news, setNews] = useState(null);
+  // Segnare "visto" cambia anche i pallini sulle celle, quindi il mese va riletto.
+  const refreshNews = useCallback(async () => {
+    setNews(await api.get('/api/news'));
+    setData(await api.get(`/api/calendar/${month}`));
+  }, [month]);
+  useEffect(() => { api.get('/api/news').then(setNews); }, []);
+
   const [year, monthIndex] = month.split('-');
 
   return (
     <main className="month">
+      <News news={news} onSeen={refreshNews} />
+
       {agenda && <Countdown meetup={agenda.nextMeetup} />}
 
       <header className="month__head">
@@ -78,6 +89,9 @@ export function Month({ user }) {
       )}
 
       <nav className="month__links">
+        <button onClick={() => navigate(`/riepilogo/${month}`)}>
+          Riepilogo di {MONTH_NAMES[Number(monthIndex) - 1]} →
+        </button>
         <button onClick={() => navigate('/timeline')}>Vedi la striscia del tempo →</button>
       </nav>
 

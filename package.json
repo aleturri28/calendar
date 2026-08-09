@@ -10,6 +10,8 @@
     "build": "npm run build --workspace client",
     "start": "node server/src/index.js",
     "seed": "node prisma/seed.js",
+    "backup": "node scripts/backup.js",
+    "restore": "node scripts/restore.js",
     "migrate": "prisma migrate deploy",
     "generate": "prisma generate",
     "vercel-build": "npx prisma generate && npm run build"

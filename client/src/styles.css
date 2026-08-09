@@ -139,7 +139,13 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 14px;
 }
 
-.month__links { text-align: center; margin: 14px 0 4px; }
+.month__links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 18px 0 4px;
+}
 
 .month__links button {
   background: none;
@@ -147,6 +153,31 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--rose-deep);
   font-size: 14px;
   padding: 8px;
+}
+
+/* ---------- novità ---------- */
+
+.news {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 11px 14px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(192, 138, 114, .13);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 14.5px;
+  text-align: left;
+}
+
+.news__dot {
+  flex: 0 0 auto;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--rose);
 }
 
 /* ---------- countdown ---------- */
@@ -370,6 +401,16 @@ button { font-family: inherit; cursor: pointer; }
   line-height: 1;
 }
 
+.cell__fresh {
+  position: absolute;
+  bottom: 5px; right: 5px;
+  z-index: 1;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--rose);
+  box-shadow: 0 0 0 1.5px var(--frame);
+}
+
 /* Un giorno segnato porta una riga sotto il numero; se è un incontro, dorata. */
 .cell--event { border-bottom-width: 3px; border-bottom-color: var(--line); }
 .cell--meetup { border-bottom-width: 3px; border-bottom-color: var(--gold); }
@@ -557,6 +598,56 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--ink-soft);
   margin: 0 0 8px 2px;
   font-style: italic;
+}
+
+/* ---------- riepilogo mensile ---------- */
+
+.recap { max-width: 460px; margin: 0 auto; padding: 22px 18px 56px; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 22px 0 6px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 14px 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--frame);
+}
+
+.stat__value { font-family: var(--serif); font-size: 26px; color: var(--rose-deep); line-height: 1; }
+.stat__label { font-size: 10.5px; color: var(--ink-soft); text-align: center; }
+
+.recap__line {
+  font-family: var(--serif);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 16px 2px 0;
+}
+
+.collage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-top: 26px;
+}
+
+.collage__tile {
+  aspect-ratio: 1;
+  border: 3px solid var(--frame);
+  border-radius: 2px;
+  padding: 0;
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-soft);
 }
 
 /* ---------- striscia del tempo ---------- */

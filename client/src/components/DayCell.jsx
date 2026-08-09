@@ -34,6 +34,7 @@ export function DayCell({ day, isToday, onOpen }) {
       <span className="cell__number">{Number(day.date.slice(8))}</span>
       {late && <span className="cell__late" title="caricato in ritardo">·</span>}
       {marker && <span className="cell__event">{marker}</span>}
+      {day.users.some((u) => u.fresh) && <span className="cell__fresh" aria-label="nuovo" />}
       <span className="visually-hidden">
         {STATE_LABELS[day.state]}
         {events.length > 0 && `, ${events.map((e) => e.title).join(', ')}`}

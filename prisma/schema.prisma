@@ -14,6 +14,8 @@ model User {
   id           Int        @id @default(autoincrement())
   name         String     @unique
   passwordHash String
+  // Ultima volta che questa persona ha dichiarato di aver visto le novità.
+  lastSeenAt   DateTime?
   entries      DayEntry[]
   comments     Comment[]
 }

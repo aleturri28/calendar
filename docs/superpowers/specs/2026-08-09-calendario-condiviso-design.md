@@ -48,6 +48,21 @@ Solo 2 utenti fissi. Niente registrazione, niente feed, niente like.
   numero, dorata se è un incontro. Un evento lo cancella chiunque dei due: è un fatto
   condiviso, non una frase di qualcuno, al contrario dei commenti.
 
+- **Indicatore di novità**: `User.lastSeenAt` registra l'ultimo sguardo. In cima al
+  calendario compare cosa ha fatto l'altro da allora, e i giorni con contenuti non ancora
+  visti portano un pallino. Si azzera toccando l'indicatore, non aprendo l'app: aprire e
+  basta non vuol dire aver guardato.
+- **Riepilogo mensile** (`/riepilogo/:mese`): giorni pieni, giorni consecutivi, foto e
+  video contati, chi ha commentato di più, giorno più chiacchierato, e le foto del mese in
+  griglia. Calcolato al volo a ogni richiesta invece che generato da un cron il primo del
+  mese: i dati sono pochi, e così il riepilogo è leggibile anche a mese in corso.
+- **Backup e ripristino** (`npm run backup` / `npm run restore`): esporta in JSON tutto
+  ciò che lega i file al percorso. Gli hash delle password restano fuori. Il ripristino si
+  rifiuta di partire su un database non vuoto.
+- **Widget iOS** (`/api/widget/today`): unico endpoint senza sessione, protetto da
+  `WIDGET_TOKEN` e limitato alle miniature del giorno. Se la variabile non è configurata
+  risponde 503 e il widget resta spento. Lo script Scriptable sta in `scriptable/`.
+
 ## Cosa entra in questo giro
 
 Login, calendario mensile, upload foto+video con minimo impostato dall'altro, vista giorno.

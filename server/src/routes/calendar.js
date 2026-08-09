@@ -26,6 +26,13 @@ calendarRouter.get('/:month', requireAuth, async (req, res) => {
     where: { date: { startsWith: `${month}-` } },
   });
 
+  const since = users.find((u) => u.id === req.userId)?.lastSeenAt ?? null;
+  const isFresh = (entry, userId) => {
+    if (!since || userId === req.userId || !entry) return false;
+    return (entry.photoUploadedAt && entry.photoUploadedAt > since)
+      || (entry.videoUploadedAt && entry.videoUploadedAt > since);
+  };
+
   // Eventi che toccano il mese, anche se cominciano prima o finiscono dopo.
   const monthDays = daysInMonth(month);
   const first = monthDays[0];
@@ -43,6 +50,7 @@ calendarRouter.get('/:month', requireAuth, async (req, res) => {
       return {
         ...entryStatus(entry, user),
         isMe: user.id === req.userId,
+        fresh: Boolean(isFresh(entry, user.id)),
         // Miniatura piccola: la cella la usa come sfondo.
         thumb: thumbnailUrl(entry?.photoUrl ?? null) ?? videoPosterUrl(entry?.videoUrl ?? null),
       };

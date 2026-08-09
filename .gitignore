@@ -12,6 +12,7 @@ dist/
 client/dist/
 
 # database
+backups/
 *.db
 *.db-journal
 *.sqlite

@@ -9,6 +9,9 @@ import { calendarRouter } from './routes/calendar.js';
 import { commentsRouter } from './routes/comments.js';
 import { feedRouter, timelineRouter } from './routes/stream.js';
 import { eventsRouter } from './routes/events.js';
+import { newsRouter } from './routes/news.js';
+import { summaryRouter } from './routes/summary.js';
+import { widgetRouter } from './routes/widget.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const clientDist = join(here, '../../client/dist');
@@ -25,6 +28,9 @@ export function createApp() {
   app.use('/api/feed', feedRouter);
   app.use('/api/timeline', timelineRouter);
   app.use('/api/events', eventsRouter);
+  app.use('/api/news', newsRouter);
+  app.use('/api/summary', summaryRouter);
+  app.use('/api/widget', widgetRouter);
   app.use('/api', commentsRouter);
 
   // Il 404 JSON sotto /api deve venire prima del fallback SPA, altrimenti una
