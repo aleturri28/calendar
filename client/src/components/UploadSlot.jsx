@@ -7,6 +7,19 @@ const LABELS = { photo: 'Foto', video: 'Video' };
 // Deve restare allineato a MAX_VIDEO_SECONDS lato server.
 export const MAX_VIDEO_SECONDS = 60;
 
+// Limiti del piano gratuito di Cloudinary. Superarli fa fallire l'upload con
+// un errore poco comprensibile: meglio fermarsi prima e spiegare perché.
+const MAX_BYTES = { photo: 10 * 1024 * 1024, video: 100 * 1024 * 1024 };
+
+const SIZE_HINT = {
+  photo: 'Prova con una foto meno pesante.',
+  video: 'Se registri in 4K, passa a 1080p: Impostazioni → Fotocamera → Registra video.',
+};
+
+function megabytes(bytes) {
+  return Math.round(bytes / 1048576);
+}
+
 export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
   const input = useRef(null);
   const [busy, setBusy] = useState(false);
@@ -18,6 +31,14 @@ export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
     if (!file) return;
 
     setError(null);
+
+    if (file.size > MAX_BYTES[kind]) {
+      setError(
+        `Il file pesa ${megabytes(file.size)}MB, il massimo è ` +
+        `${megabytes(MAX_BYTES[kind])}MB. ${SIZE_HINT[kind]}`
+      );
+      return;
+    }
 
     if (kind === 'video') {
       const duration = await readVideoDuration(file);
