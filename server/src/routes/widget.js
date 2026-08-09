@@ -46,13 +46,20 @@ widgetRouter.get('/latest', async (req, res) => {
 
   const today = romeDate();
 
+  // Sostituire la foto di un giorno riusa lo stesso public_id, quindi l'URL
+  // non cambierebbe e la cache del telefono continuerebbe a mostrare quella
+  // vecchia. Il momento di caricamento in coda rende l'indirizzo diverso a
+  // ogni contenuto nuovo; Cloudinary ignora i parametri che non conosce.
+  const thumb = thumbnailUrl(entry?.photoUrl ?? null, 500);
+  const version = entry?.photoUploadedAt?.getTime();
+
   res.json({
     viewer: viewer.name,
     from: other.name,
     hasPhoto: Boolean(entry),
     date: entry?.date ?? null,
     isToday: entry?.date === today,
-    thumb: thumbnailUrl(entry?.photoUrl ?? null, 500),
+    thumb: thumb && version ? `${thumb}?v=${version}` : thumb,
   });
 });
 

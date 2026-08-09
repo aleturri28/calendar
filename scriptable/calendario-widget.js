@@ -44,8 +44,10 @@ async function build() {
   widget.backgroundColor = PAPER;
   widget.setPadding(12, 12, 12, 12);
   widget.url = BASE_URL;
-  // Il widget iOS si aggiorna quando vuole lui: mezz'ora è solo un suggerimento.
-  widget.refreshAfterDate = new Date(Date.now() + 30 * 60 * 1000);
+  // Suggerimento, non comando: iOS decide da sé quando risvegliare un widget,
+  // in base alla batteria e a quanto lo si guarda. Chiedere più spesso del
+  // necessario non lo velocizza, chiedere di rado invece lo rallenta.
+  widget.refreshAfterDate = new Date(Date.now() + 15 * 60 * 1000);
 
   let data;
   try {

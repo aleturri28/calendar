@@ -104,6 +104,31 @@ describe('GET /api/widget/today', () => {
     expect(res.body.thumb).toContain('recuperata.jpg');
   });
 
+  it('changes the thumbnail url when the photo is replaced', async () => {
+    const entry = await db().dayEntry.create({
+      data: {
+        date: today(), userId: users.b.id,
+        photoUrl: PHOTO, photoUploadedAt: new Date('2026-08-09T09:00:00Z'),
+      },
+    });
+
+    const ask = () => supertest(app).get('/api/widget/latest')
+      .query({ token: 'un-token-lungo-abbastanza', as: 'Alessandro' });
+
+    const before = (await ask()).body.thumb;
+
+    // Stessa foto sostituita: stesso public_id, quindi stesso URL di base.
+    await db().dayEntry.update({
+      where: { id: entry.id },
+      data: { photoUploadedAt: new Date('2026-08-09T20:00:00Z') },
+    });
+
+    const after = (await ask()).body.thumb;
+
+    expect(after).not.toBe(before);
+    expect(after.split('?')[0]).toBe(before.split('?')[0]);
+  });
+
   it('is symmetric: she sees him', async () => {
     await db().dayEntry.create({
       data: { date: today(), userId: users.a.id, photoUrl: PHOTO, photoUploadedAt: new Date() },
