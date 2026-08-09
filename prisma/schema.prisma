@@ -22,7 +22,6 @@ model DayEntry {
   date            String
   userId          Int
   user            User      @relation(fields: [userId], references: [id])
-  minDuration     Int       @default(30)
   photoUrl        String?
   photoPublicId   String?
   photoUploadedAt DateTime?

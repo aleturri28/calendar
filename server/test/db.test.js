@@ -13,9 +13,10 @@ describe('schema', () => {
     ).rejects.toThrow();
   });
 
-  it('defaults minDuration to 30', async () => {
+  it('starts an entry with no media attached', async () => {
     const { a } = await createUsers();
     const entry = await db().dayEntry.create({ data: { date: '2026-08-10', userId: a.id } });
-    expect(entry.minDuration).toBe(30);
+    expect(entry.photoUrl).toBeNull();
+    expect(entry.videoUrl).toBeNull();
   });
 });

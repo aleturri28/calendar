@@ -26,14 +26,19 @@ describe('GET /api/days/:date', () => {
     expect(res.body.isOpen).toBe(true);
   });
 
-  it('reports the minimum the other user set for me', async () => {
+  it('reports what each user has already posted', async () => {
     await db().dayEntry.create({
-      data: { date: today(), userId: users.b.id, minDuration: 55 },
+      data: {
+        date: today(), userId: users.b.id,
+        photoUrl: 'https://res.cloudinary.com/testcloud/p.jpg',
+        photoUploadedAt: new Date(),
+      },
     });
     const agent = await loginAs(app, 'Lei', 'password-b');
     const res = await agent.get(`/api/days/${today()}`);
 
-    expect(res.body.users[0].minDuration).toBe(55);
+    expect(res.body.users[0].hasPhoto).toBe(true);
+    expect(res.body.users[0].hasVideo).toBe(false);
   });
 
   it('rejects a date before the calendar start', async () => {

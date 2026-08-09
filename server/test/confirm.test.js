@@ -42,48 +42,20 @@ describe('POST /api/days/:date/confirm', () => {
     expect(entry.videoUploadedAt).toBeInstanceOf(Date);
   });
 
-  it('rejects and deletes a video shorter than the minimum', async () => {
+  // Non esiste più una durata minima: un video brevissimo è accettabile.
+  it('accepts a very short video', async () => {
     const agent = await loginAs(app, 'Alessandro', 'password-a');
-    await db().dayEntry.create({
-      data: { date: today(), userId: users.a.id, minDuration: 60 },
-    });
-
     vi.spyOn(cloud, 'fetchResource').mockResolvedValue({
-      secure_url: 'https://res.cloudinary.com/testcloud/video/upload/v1/short.mp4',
-      duration: 12,
+      secure_url: 'https://res.cloudinary.com/testcloud/video/upload/v1/brief.mp4',
+      duration: 3,
     });
-    const destroy = vi.spyOn(cloud, 'destroyResource').mockResolvedValue({ result: 'ok' });
 
     const res = await agent.post(`/api/days/${today()}/confirm`).send({
       kind: 'video',
       publicId: `calendar/${today()}/${users.a.id}-video`,
     });
 
-    expect(res.status).toBe(422);
-    expect(res.body).toMatchObject({ error: 'video_too_short', duration: 12, minDuration: 60 });
-    expect(destroy).toHaveBeenCalledWith(`calendar/${today()}/${users.a.id}-video`, 'video');
-
-    const entry = await db().dayEntry.findUnique({
-      where: { date_userId: { date: today(), userId: users.a.id } },
-    });
-    expect(entry.videoUrl).toBeNull();
-  });
-
-  it('applies the default minimum of 30s when nobody set one', async () => {
-    const agent = await loginAs(app, 'Alessandro', 'password-a');
-    vi.spyOn(cloud, 'fetchResource').mockResolvedValue({
-      secure_url: 'https://res.cloudinary.com/testcloud/video/upload/v1/x.mp4',
-      duration: 20,
-    });
-    vi.spyOn(cloud, 'destroyResource').mockResolvedValue({ result: 'ok' });
-
-    const res = await agent.post(`/api/days/${today()}/confirm`).send({
-      kind: 'video',
-      publicId: `calendar/${today()}/${users.a.id}-video`,
-    });
-
-    expect(res.status).toBe(422);
-    expect(res.body.minDuration).toBe(30);
+    expect(res.status).toBe(200);
   });
 
   it('rejects and deletes a video longer than one minute', async () => {

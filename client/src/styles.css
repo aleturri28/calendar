@@ -42,8 +42,7 @@ body {
 .day__head h1 { font-size: 18px; font-weight: 500; }
 .day__column { margin-top: 24px; }
 .day__column h2 { font-size: 15px; font-weight: 600; opacity: .7; }
-.day__min { font-size: 13px; opacity: .6; display: flex; gap: 8px; align-items: center; }
-.day__closed, .day__empty { font-size: 13px; opacity: .5; }
+.day__hint, .day__closed, .day__empty { font-size: 13px; opacity: .5; }
 
 .slot { margin-bottom: 16px; }
 .slot__media { width: 100%; border-radius: 10px; display: block; background: #000; }

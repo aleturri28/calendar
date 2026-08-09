@@ -20,7 +20,7 @@ function megabytes(bytes) {
   return Math.round(bytes / 1048576);
 }
 
-export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
+export function UploadSlot({ date, kind, url, disabled, onDone }) {
   const input = useRef(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -42,10 +42,6 @@ export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
 
     if (kind === 'video') {
       const duration = await readVideoDuration(file);
-      if (duration !== null && duration < minDuration) {
-        setError(`Servono almeno ${minDuration}s, questo dura ${Math.round(duration)}s`);
-        return;
-      }
       if (duration !== null && duration > MAX_VIDEO_SECONDS) {
         setError(`Il massimo è ${MAX_VIDEO_SECONDS}s, questo dura ${Math.round(duration)}s`);
         return;
@@ -59,9 +55,7 @@ export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
       await api.post(`/api/days/${date}/confirm`, { kind, publicId: signature.publicId });
       await onDone();
     } catch (err) {
-      if (err.data?.error === 'video_too_short') {
-        setError(`Servono almeno ${err.data.minDuration}s, questo dura ${Math.round(err.data.duration)}s`);
-      } else if (err.data?.error === 'video_too_long') {
+      if (err.data?.error === 'video_too_long') {
         setError(`Il massimo è ${err.data.maxDuration}s, questo dura ${Math.round(err.data.duration)}s`);
       } else if (err.data?.error === 'window_closed') {
         setError('Questo giorno è chiuso');

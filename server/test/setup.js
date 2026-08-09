@@ -39,9 +39,10 @@ process.env.DIRECT_DATABASE_URL = url;
 // Vitest gira con cwd server/, lo schema sta nella root del repo.
 const schema = join(root, 'prisma/schema.prisma');
 
-// Solo allineamento dello schema: niente reset distruttivo, sono i test a
-// svuotare le tabelle con resetDb() prima di ciascun caso.
-execSync(`npx prisma db push --schema "${schema}" --skip-generate`, {
+// --accept-data-loss serve quando lo schema perde una colonna: su un database
+// di test è il comportamento voluto, ed è sicuro perché testUrlFromDev qui
+// sopra rifiuta qualunque host che non sia locale.
+execSync(`npx prisma db push --schema "${schema}" --skip-generate --accept-data-loss`, {
   env: process.env,
   stdio: 'ignore',
 });

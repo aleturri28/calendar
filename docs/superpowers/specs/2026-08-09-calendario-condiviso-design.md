@@ -20,9 +20,9 @@ Solo 2 utenti fissi. Niente registrazione, niente feed, niente like.
 | Finestra di upload | Oggi + 7 giorni indietro. Oltre, il giorno è congelato. |
 | Modifica entro la finestra | Consentita: sovrascrittura semplice, nessuno storico. |
 | Ritardi | Un contenuto caricato dopo il suo giorno è marcato "in ritardo". |
-| Durata minima video | La imposta **l'altro utente**, in anticipo. Default 30s. |
-| Durata massima video | 60s, tetto fisso. Vale anche come limite superiore del minimo imponibile. |
-| Video fuori dai limiti | Upload bloccato, non un avviso. |
+| Durata massima video | 60s, tetto fisso. Nessuna durata minima. |
+| Video oltre il tetto | Upload bloccato, non un avviso. |
+| Dimensione file | Max 100MB per video, 10MB per foto (limiti del piano gratuito Cloudinary). |
 | Fuso orario | `Europe/Rome` fisso per entrambi (Italia e Palma sono nello stesso fuso). |
 | Eventi | Singoli e multi-giorno, con flag `isMeetup` e countdown al prossimo incontro. |
 | Hosting | Vercel Hobby, con le API come funzione serverless unica. |
@@ -95,7 +95,6 @@ DayEntry {
   id              Int      @id @default(autoincrement())
   date            String   // "YYYY-MM-DD", Europe/Rome
   userId          Int
-  minDuration     Int      @default(30)  // secondi, scritto dall'ALTRO utente
   photoUrl        String?
   photoPublicId   String?
   photoUploadedAt DateTime?
@@ -126,8 +125,9 @@ Note sulle scelte:
   `videoUploadedAt`) con la fine del giorno `date` in `Europe/Rome`. Così una foto puntuale
   e un video caricato due giorni dopo restano distinti, senza flag ridondanti da mantenere
   in sincrono.
-- `minDuration` sta sul DayEntry del **destinatario** e lo scrive l'altro utente. La riga
-  nasce alla prima delle due azioni che capita: l'altro imposta il minimo, oppure tu carichi.
+- La durata minima imposta dall'altro utente è stata rimossa: con un tetto fisso di 60
+  secondi non aggiungeva vincoli utili, e con essa sono spariti il campo `minDuration`,
+  la sua route e il selettore nella vista giorno.
 
 ### Stati della cella del calendario
 
@@ -170,7 +170,6 @@ GET  /api/calendar/:month     "YYYY-MM" → stato di ogni giorno del mese
 GET  /api/days/:date          → contenuti di entrambi + il tuo minimo + finestra aperta?
 POST /api/days/:date/signature   {kind: "photo"|"video"}
 POST /api/days/:date/confirm     {kind, publicId}
-PUT  /api/days/:date/min-duration {seconds} → scrive sul DayEntry dell'ALTRO utente
 ```
 
 ### Errori
@@ -182,7 +181,6 @@ PUT  /api/days/:date/min-duration {seconds} → scrive sul DayEntry dell'ALTRO u
 | Tentativo di impostare il minimo a sé stessi | 403 |
 | Durata reale sotto il minimo (al confirm) | 422 |
 | `publicId` inesistente su Cloudinary | 404 |
-| `minDuration` fuori da 5–60 secondi | 400 |
 | Durata reale sopra i 60 secondi (al confirm) | 422 |
 
 Sul 422 il server **cancella la risorsa da Cloudinary** prima di rispondere, così un video
@@ -206,9 +204,8 @@ dialetto emergono nei test e non in produzione.
 Priorità ai casi dove un bug fa danno silenzioso:
 
 - upload rifiutato fuori dalla finestra dei 7 giorni e per date future;
-- `confirm` che rifiuta un video la cui durata reale è sotto il minimo, anche quando il
-  client dichiara il contrario, e che cancella la risorsa;
-- `min-duration` scritto solo sul DayEntry dell'altro utente, mai sul proprio;
+- `confirm` che rifiuta e cancella un video oltre i 60 secondi, basandosi sulla durata
+  reale letta da Cloudinary anche quando il client ne dichiara un'altra;
 - calcolo di "in ritardo" a cavallo della mezzanotte in `Europe/Rome`;
 - `signature` che rifiuta le richieste non autenticate.
 
