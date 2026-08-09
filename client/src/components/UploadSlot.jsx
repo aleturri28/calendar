@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { api } from '../api.js';
 import { readVideoDuration, uploadToCloudinary } from '../upload.js';
+import { Polaroid } from './Polaroid.jsx';
 
 const LABELS = { photo: 'Foto', video: 'Video' };
 
@@ -69,13 +70,19 @@ export function UploadSlot({ date, kind, url, disabled, onDone }) {
     }
   }
 
+  const label = LABELS[kind].toLowerCase();
+
   return (
     <div className="slot">
-      {kind === 'photo'
-        ? url && <img className="slot__media" src={url} alt="" />
-        : url && <video className="slot__media" src={url} controls playsInline />}
-
-      {!url && <div className="slot__empty">{LABELS[kind]}</div>}
+      {url
+        ? (
+          <Polaroid seed={`${date}-${kind}-me`} caption={LABELS[kind]}>
+            {kind === 'photo'
+              ? <img src={url} alt="" />
+              : <video src={url} controls playsInline />}
+          </Polaroid>
+        )
+        : <div className="slot__empty">{LABELS[kind]}</div>}
 
       {!disabled && (
         <>
@@ -87,7 +94,7 @@ export function UploadSlot({ date, kind, url, disabled, onDone }) {
             onChange={pick}
           />
           <button className="slot__button" disabled={busy} onClick={() => input.current.click()}>
-            {busy ? 'Carico…' : url ? `Sostituisci ${LABELS[kind].toLowerCase()}` : `Carica ${LABELS[kind].toLowerCase()}`}
+            {busy ? 'Sviluppo…' : url ? `Sostituisci ${label}` : `Aggiungi ${label}`}
           </button>
         </>
       )}

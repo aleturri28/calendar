@@ -22,7 +22,8 @@ export function Login({ onLogin }) {
 
   return (
     <form className="login" onSubmit={submit}>
-      <h1>Calendario</h1>
+      <h1>Il nostro calendario</h1>
+      <p className="login__sub">un giorno alla volta, insieme</p>
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
@@ -38,7 +39,7 @@ export function Login({ onLogin }) {
         autoComplete="current-password"
       />
       <button disabled={busy || !name || !password}>
-        {busy ? 'Attendi…' : 'Entra'}
+        {busy ? 'Un attimo…' : 'Entra'}
       </button>
       {error && <p className="error">{error}</p>}
     </form>
