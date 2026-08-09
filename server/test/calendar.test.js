@@ -28,12 +28,12 @@ describe('GET /api/days/:date', () => {
 
   it('reports the minimum the other user set for me', async () => {
     await db().dayEntry.create({
-      data: { date: today(), userId: users.b.id, minDuration: 75 },
+      data: { date: today(), userId: users.b.id, minDuration: 55 },
     });
     const agent = await loginAs(app, 'Lei', 'password-b');
     const res = await agent.get(`/api/days/${today()}`);
 
-    expect(res.body.users[0].minDuration).toBe(75);
+    expect(res.body.users[0].minDuration).toBe(55);
   });
 
   it('rejects a date before the calendar start', async () => {

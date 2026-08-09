@@ -86,6 +86,45 @@ describe('POST /api/days/:date/confirm', () => {
     expect(res.body.minDuration).toBe(30);
   });
 
+  it('rejects and deletes a video longer than one minute', async () => {
+    const agent = await loginAs(app, 'Alessandro', 'password-a');
+
+    vi.spyOn(cloud, 'fetchResource').mockResolvedValue({
+      secure_url: 'https://res.cloudinary.com/testcloud/video/upload/v1/long.mp4',
+      duration: 74,
+    });
+    const destroy = vi.spyOn(cloud, 'destroyResource').mockResolvedValue({ result: 'ok' });
+
+    const res = await agent.post(`/api/days/${today()}/confirm`).send({
+      kind: 'video',
+      publicId: `calendar/${today()}/${users.a.id}-video`,
+    });
+
+    expect(res.status).toBe(422);
+    expect(res.body).toMatchObject({ error: 'video_too_long', duration: 74, maxDuration: 60 });
+    expect(destroy).toHaveBeenCalledWith(`calendar/${today()}/${users.a.id}-video`, 'video');
+
+    const entry = await db().dayEntry.findUnique({
+      where: { date_userId: { date: today(), userId: users.a.id } },
+    });
+    expect(entry).toBeNull();
+  });
+
+  it('accepts a video of exactly one minute', async () => {
+    const agent = await loginAs(app, 'Alessandro', 'password-a');
+    vi.spyOn(cloud, 'fetchResource').mockResolvedValue({
+      secure_url: 'https://res.cloudinary.com/testcloud/video/upload/v1/exact.mp4',
+      duration: 60,
+    });
+
+    const res = await agent.post(`/api/days/${today()}/confirm`).send({
+      kind: 'video',
+      publicId: `calendar/${today()}/${users.a.id}-video`,
+    });
+
+    expect(res.status).toBe(200);
+  });
+
   it('does not apply a duration check to photos', async () => {
     const agent = await loginAs(app, 'Alessandro', 'password-a');
     vi.spyOn(cloud, 'fetchResource').mockResolvedValue({

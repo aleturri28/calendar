@@ -45,7 +45,7 @@ export function Day() {
           Minimo che hai imposto: {other.minDuration}s
           {canSetMinimum && (
             <select value={other.minDuration} onChange={(e) => setMinimum(Number(e.target.value))}>
-              {[15, 30, 45, 60, 90, 120, 180].map((s) => <option key={s} value={s}>{s}s</option>)}
+              {[15, 30, 45, 60].map((s) => <option key={s} value={s}>{s}s</option>)}
             </select>
           )}
         </p>

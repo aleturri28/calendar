@@ -19,7 +19,7 @@ describe('PUT /api/days/:date/min-duration', () => {
     const agent = await loginAs(app, 'Alessandro', 'password-a');
     const res = await agent
       .put(`/api/days/${today()}/min-duration`)
-      .send({ seconds: 90 });
+      .send({ seconds: 45 });
 
     expect(res.status).toBe(200);
 
@@ -30,7 +30,7 @@ describe('PUT /api/days/:date/min-duration', () => {
       where: { date_userId: { date: today(), userId: users.b.id } },
     });
 
-    expect(theirs.minDuration).toBe(90);
+    expect(theirs.minDuration).toBe(45);
     expect(mine).toBeNull();
   });
 
@@ -58,12 +58,19 @@ describe('PUT /api/days/:date/min-duration', () => {
     vi.useRealTimers();
   });
 
-  it('rejects values outside 5-600', async () => {
+  it('rejects values outside 5-60', async () => {
     const agent = await loginAs(app, 'Alessandro', 'password-a');
-    for (const seconds of [0, 4, 601, 3.5, 'tanto']) {
+    for (const seconds of [0, 4, 61, 600, 3.5, 'tanto']) {
       const res = await agent.put(`/api/days/${today()}/min-duration`).send({ seconds });
       expect(res.status).toBe(400);
     }
+  });
+
+  // Il minimo non può superare il tetto: chiederebbe un video impossibile.
+  it('accepts a minimum equal to the one-minute cap', async () => {
+    const agent = await loginAs(app, 'Alessandro', 'password-a');
+    const res = await agent.put(`/api/days/${today()}/min-duration`).send({ seconds: 60 });
+    expect(res.status).toBe(200);
   });
 
   it('rejects an invalid date', async () => {

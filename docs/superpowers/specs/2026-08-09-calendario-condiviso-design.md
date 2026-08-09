@@ -21,7 +21,8 @@ Solo 2 utenti fissi. Niente registrazione, niente feed, niente like.
 | Modifica entro la finestra | Consentita: sovrascrittura semplice, nessuno storico. |
 | Ritardi | Un contenuto caricato dopo il suo giorno è marcato "in ritardo". |
 | Durata minima video | La imposta **l'altro utente**, in anticipo. Default 30s. |
-| Video sotto il minimo | Upload bloccato, non un avviso. |
+| Durata massima video | 60s, tetto fisso. Vale anche come limite superiore del minimo imponibile. |
+| Video fuori dai limiti | Upload bloccato, non un avviso. |
 | Fuso orario | `Europe/Rome` fisso per entrambi (Italia e Palma sono nello stesso fuso). |
 | Eventi | Singoli e multi-giorno, con flag `isMeetup` e countdown al prossimo incontro. |
 | Hosting | Vercel Hobby, con le API come funzione serverless unica. |
@@ -181,7 +182,8 @@ PUT  /api/days/:date/min-duration {seconds} → scrive sul DayEntry dell'ALTRO u
 | Tentativo di impostare il minimo a sé stessi | 403 |
 | Durata reale sotto il minimo (al confirm) | 422 |
 | `publicId` inesistente su Cloudinary | 404 |
-| `minDuration` fuori da 5–600 secondi | 400 |
+| `minDuration` fuori da 5–60 secondi | 400 |
+| Durata reale sopra i 60 secondi (al confirm) | 422 |
 
 Sul 422 il server **cancella la risorsa da Cloudinary** prima di rispondere, così un video
 rifiutato non resta orfano a consumare quota.

@@ -4,6 +4,9 @@ import { readVideoDuration, uploadToCloudinary } from '../upload.js';
 
 const LABELS = { photo: 'Foto', video: 'Video' };
 
+// Deve restare allineato a MAX_VIDEO_SECONDS lato server.
+export const MAX_VIDEO_SECONDS = 60;
+
 export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
   const input = useRef(null);
   const [busy, setBusy] = useState(false);
@@ -22,6 +25,10 @@ export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
         setError(`Servono almeno ${minDuration}s, questo dura ${Math.round(duration)}s`);
         return;
       }
+      if (duration !== null && duration > MAX_VIDEO_SECONDS) {
+        setError(`Il massimo è ${MAX_VIDEO_SECONDS}s, questo dura ${Math.round(duration)}s`);
+        return;
+      }
     }
 
     setBusy(true);
@@ -33,6 +40,8 @@ export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
     } catch (err) {
       if (err.data?.error === 'video_too_short') {
         setError(`Servono almeno ${err.data.minDuration}s, questo dura ${Math.round(err.data.duration)}s`);
+      } else if (err.data?.error === 'video_too_long') {
+        setError(`Il massimo è ${err.data.maxDuration}s, questo dura ${Math.round(err.data.duration)}s`);
       } else if (err.data?.error === 'window_closed') {
         setError('Questo giorno è chiuso');
       } else if (err.detail) {

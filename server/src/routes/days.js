@@ -4,7 +4,7 @@ import { requireAuth } from '../lib/auth.js';
 import { isValidDate, isUploadOpen, romeDate, START_DATE } from '../lib/dates.js';
 import {
   otherUserId, publicIdFor, resourceTypeFor, entryStatus,
-  MIN_SECONDS, MAX_SECONDS, DEFAULT_MIN_DURATION,
+  MIN_SECONDS, MAX_SECONDS, DEFAULT_MIN_DURATION, MAX_VIDEO_SECONDS,
 } from '../lib/days.js';
 // Import del modulo intero, non delle singole funzioni: è la forma che
 // vi.spyOn può intercettare nei test.
@@ -84,6 +84,12 @@ daysRouter.post('/:date/confirm', requireAuth, async (req, res) => {
     if (duration < minDuration) {
       await cloud.destroyResource(publicId, resourceType);
       return res.status(422).json({ error: 'video_too_short', duration, minDuration });
+    }
+    if (duration > MAX_VIDEO_SECONDS) {
+      await cloud.destroyResource(publicId, resourceType);
+      return res.status(422).json({
+        error: 'video_too_long', duration, maxDuration: MAX_VIDEO_SECONDS,
+      });
     }
   }
 

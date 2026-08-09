@@ -1,8 +1,13 @@
 import { db } from './db.js';
 import { isLate } from './dates.js';
 
+// Tetto assoluto sulla durata di un video. Vale anche come limite superiore
+// per il minimo che si può imporre all'altro: nessuno può chiedere più di
+// quanto sia possibile caricare.
+export const MAX_VIDEO_SECONDS = 60;
+
 export const MIN_SECONDS = 5;
-export const MAX_SECONDS = 600;
+export const MAX_SECONDS = MAX_VIDEO_SECONDS;
 export const DEFAULT_MIN_DURATION = 30;
 
 export function publicIdFor(date, userId, kind) {
