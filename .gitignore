@@ -1,8 +1,7 @@
 CLAUDE.md
 
 # secrets
-.env
-.env.*
+.env*
 !.env.example
 
 # dependencies
@@ -20,3 +19,4 @@ client/dist/
 # os / editor
 .DS_Store
 *.log
+.vercel
