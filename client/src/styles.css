@@ -1,0 +1,57 @@
+:root { --bg: #fbf7f0; --ink: #3b3330; --line: #ded3c4; --accent: #c08a72; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+/* 16px sugli input: sotto questa soglia Safari iOS fa zoom automatico al focus. */
+.login { display: flex; flex-direction: column; gap: 12px; max-width: 320px; margin: 15vh auto; padding: 0 20px; }
+.login input, .login button { font-size: 16px; padding: 12px; border-radius: 10px; border: 1px solid var(--line); }
+.login button { background: var(--accent); color: white; border: none; }
+.error { color: #a33; }
+.loading { text-align: center; margin-top: 40vh; }
+
+.month { max-width: 480px; margin: 0 auto; padding: 16px; }
+.month__head { display: flex; align-items: center; justify-content: space-between; }
+.month__head h1 { font-size: 20px; font-weight: 500; }
+.month__head button { background: none; border: none; font-size: 24px; color: var(--ink); }
+.month__hint { text-align: center; opacity: .5; font-size: 13px; }
+
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.grid__weekday { text-align: center; font-size: 12px; opacity: .5; padding-bottom: 4px; }
+
+.cell {
+  aspect-ratio: 1; border: 1px solid var(--line); border-radius: 10px;
+  background: transparent; color: var(--ink); font-size: 14px;
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.cell--void { border: none; }
+.cell--partial { background: #f0e4d8; }
+.cell--complete { background: var(--accent); color: white; border-color: var(--accent); }
+.cell--today { outline: 2px solid var(--accent); outline-offset: 1px; }
+.cell__late { position: absolute; top: 3px; right: 6px; opacity: .6; }
+
+.day { max-width: 480px; margin: 0 auto; padding: 16px; }
+.day__head { display: flex; align-items: center; gap: 12px; }
+.day__head button { background: none; border: none; font-size: 24px; color: var(--ink); }
+.day__head h1 { font-size: 18px; font-weight: 500; }
+.day__column { margin-top: 24px; }
+.day__column h2 { font-size: 15px; font-weight: 600; opacity: .7; }
+.day__min { font-size: 13px; opacity: .6; display: flex; gap: 8px; align-items: center; }
+.day__closed, .day__empty { font-size: 13px; opacity: .5; }
+
+.slot { margin-bottom: 16px; }
+.slot__media { width: 100%; border-radius: 10px; display: block; background: #000; }
+.slot__empty {
+  aspect-ratio: 4/3; border: 1px dashed var(--line); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; opacity: .5; font-size: 14px;
+}
+.slot__button {
+  margin-top: 8px; width: 100%; font-size: 16px; padding: 10px;
+  border-radius: 10px; border: 1px solid var(--line); background: white; color: var(--ink);
+}
