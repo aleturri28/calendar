@@ -11,6 +11,7 @@
     "start": "node server/src/index.js",
     "seed": "node prisma/seed.js",
     "backup": "node scripts/backup.js",
+    "backup:prod": "node scripts/backup-prod.js",
     "restore": "node scripts/restore.js",
     "migrate": "prisma migrate deploy",
     "generate": "prisma generate",

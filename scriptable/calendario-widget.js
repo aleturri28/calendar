@@ -10,8 +10,9 @@
 // Il widget legge soltanto: mostra la foto già caricata oggi. Non scatta
 // niente e non carica niente.
 
-const BASE_URL = 'https://calendar-client-chi.vercel.app';
-const TOKEN = 'INCOLLA-QUI-IL-TUO-WIDGET_TOKEN';
+const BASE_URL = 'https://nostro-calendario.vercel.app';
+// Il valore è nel file .env del progetto, alla riga WIDGET_TOKEN.
+const TOKEN = 'INCOLLA-QUI-IL-WIDGET_TOKEN';
 
 const PAPER = new Color('#f7f0e4');
 const INK = new Color('#3b3128');
