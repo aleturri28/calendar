@@ -1,0 +1,22 @@
+CLAUDE.md
+
+# secrets
+.env
+.env.*
+!.env.example
+
+# dependencies
+node_modules/
+
+# build
+dist/
+client/dist/
+
+# database
+*.db
+*.db-journal
+*.sqlite
+
+# os / editor
+.DS_Store
+*.log
