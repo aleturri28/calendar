@@ -3,6 +3,7 @@ import { db } from '../lib/db.js';
 import { requireAuth } from '../lib/auth.js';
 import { isUploadOpen, romeDate, START_DATE } from '../lib/dates.js';
 import { entryStatus, dayState, thumbnailUrl, videoPosterUrl } from '../lib/days.js';
+import { eventsOnDate, serializeEvent } from '../lib/events.js';
 
 export const calendarRouter = express.Router();
 
@@ -25,7 +26,18 @@ calendarRouter.get('/:month', requireAuth, async (req, res) => {
     where: { date: { startsWith: `${month}-` } },
   });
 
-  const days = daysInMonth(month).map((date) => {
+  // Eventi che toccano il mese, anche se cominciano prima o finiscono dopo.
+  const monthDays = daysInMonth(month);
+  const first = monthDays[0];
+  const last = monthDays[monthDays.length - 1];
+  const events = await db().event.findMany({
+    where: { startDate: { lte: last }, endDate: { gte: first } },
+    orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+  });
+
+  const today = romeDate();
+
+  const days = monthDays.map((date) => {
     const statuses = users.map((user) => {
       const entry = entries.find((e) => e.date === date && e.userId === user.id) ?? null;
       return {
@@ -41,8 +53,9 @@ calendarRouter.get('/:month', requireAuth, async (req, res) => {
       isOpen: isUploadOpen(date),
       exists: date >= START_DATE,
       users: statuses,
+      events: eventsOnDate(events, date).map((e) => serializeEvent(e, today)),
     };
   });
 
-  res.json({ month, today: romeDate(), startDate: START_DATE, days });
+  res.json({ month, today, startDate: START_DATE, days });
 });

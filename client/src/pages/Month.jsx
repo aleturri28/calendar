@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api.js';
 import { CalendarGrid } from '../components/CalendarGrid.jsx';
 import { EntryMedia } from '../components/EntryMedia.jsx';
+import { Countdown } from '../components/Countdown.jsx';
+import { Events } from '../components/Events.jsx';
 
 const MONTH_NAMES = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno',
   'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
@@ -41,10 +43,20 @@ export function Month({ user }) {
   const loadFeed = useCallback(() => api.get('/api/feed').then((r) => setFeed(r.days)), []);
   useEffect(() => { loadFeed(); }, [loadFeed]);
 
+  const [agenda, setAgenda] = useState(null);
+  // Gli eventi ricadono anche sul calendario, quindi il mese va riletto.
+  const loadEvents = useCallback(async () => {
+    setAgenda(await api.get('/api/events'));
+    setData(await api.get(`/api/calendar/${month}`));
+  }, [month]);
+  useEffect(() => { api.get('/api/events').then(setAgenda); }, []);
+
   const [year, monthIndex] = month.split('-');
 
   return (
     <main className="month">
+      {agenda && <Countdown meetup={agenda.nextMeetup} />}
+
       <header className="month__head">
         <button onClick={() => setMonth(shiftMonth(month, -1))} aria-label="Mese precedente">‹</button>
         <h1>{MONTH_NAMES[Number(monthIndex) - 1]} {year}</h1>
@@ -59,6 +71,10 @@ export function Month({ user }) {
         <p className="month__hint">
           Giorno {dayNumber(data.startDate, data.today)} insieme, {user.name}.
         </p>
+      )}
+
+      {agenda && (
+        <Events today={agenda.today} events={agenda.events} onChange={loadEvents} />
       )}
 
       <nav className="month__links">

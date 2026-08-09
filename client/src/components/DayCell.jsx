@@ -14,9 +14,15 @@ export function DayCell({ day, isToday, onOpen }) {
   const other = day.users.find((u) => !u.isMe);
   const thumb = other?.thumb ?? null;
 
+  const events = day.events ?? [];
+  const meetup = events.find((e) => e.isMeetup);
+  const marker = events.find((e) => e.emoji)?.emoji ?? null;
+
   const classes = ['cell', `cell--${day.state}`];
   if (isToday) classes.push('cell--today');
   if (thumb) classes.push('cell--shot');
+  if (meetup) classes.push('cell--meetup');
+  else if (events.length) classes.push('cell--event');
 
   return (
     <button
@@ -27,7 +33,11 @@ export function DayCell({ day, isToday, onOpen }) {
     >
       <span className="cell__number">{Number(day.date.slice(8))}</span>
       {late && <span className="cell__late" title="caricato in ritardo">·</span>}
-      <span className="visually-hidden">{STATE_LABELS[day.state]}</span>
+      {marker && <span className="cell__event">{marker}</span>}
+      <span className="visually-hidden">
+        {STATE_LABELS[day.state]}
+        {events.length > 0 && `, ${events.map((e) => e.title).join(', ')}`}
+      </span>
     </button>
   );
 }

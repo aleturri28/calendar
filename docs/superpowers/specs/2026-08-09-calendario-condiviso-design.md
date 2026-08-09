@@ -42,6 +42,11 @@ Solo 2 utenti fissi. Niente registrazione, niente feed, niente like.
   con gli stessi commenti della vista giorno.
 - **Striscia del tempo** (`/timeline`): tutte le foto in sequenza orizzontale con snap,
   dal primo giorno a oggi.
+- **Eventi e countdown**: eventi singoli o su più giorni, con emoji facoltativa e un flag
+  `isMeetup`. Il countdown in cima al calendario guarda un solo incontro — quello in corso,
+  altrimenti il primo che arriva. I giorni coperti da un evento portano una riga sotto il
+  numero, dorata se è un incontro. Un evento lo cancella chiunque dei due: è un fatto
+  condiviso, non una frase di qualcuno, al contrario dei commenti.
 
 ## Cosa entra in questo giro
 

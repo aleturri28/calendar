@@ -149,6 +149,153 @@ button { font-family: inherit; cursor: pointer; }
   padding: 8px;
 }
 
+/* ---------- countdown ---------- */
+
+.countdown {
+  text-align: center;
+  padding: 18px 16px 20px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.countdown__lead {
+  font-family: var(--serif);
+  font-size: 52px;
+  line-height: 1;
+  margin: 0;
+  color: var(--rose-deep);
+  letter-spacing: -.02em;
+}
+
+.countdown__note {
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin: 8px 0 0;
+}
+
+.countdown__note strong { color: var(--ink); font-weight: 500; }
+.countdown__emoji { font-size: 16px; }
+
+.countdown--now .countdown__lead { font-size: 30px; color: var(--gold); }
+
+.countdown--empty {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+/* ---------- eventi ---------- */
+
+.events { margin-top: 34px; }
+
+.events__list { list-style: none; margin: 12px 0 0; padding: 0; }
+
+.events__item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 2px;
+  border-bottom: 1px solid rgba(221, 208, 189, .6);
+}
+
+.events__item--now { background: rgba(201, 164, 92, .12); border-radius: 8px; padding-inline: 8px; }
+
+.events__when {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink-soft);
+  flex: 0 0 auto;
+  min-width: 86px;
+}
+
+.events__what { flex: 1; font-size: 15px; }
+.events__badge { margin-right: 6px; }
+.events__meetup { color: var(--rose); margin-left: 7px; font-size: 13px; }
+
+.events__remove {
+  background: none; border: none;
+  color: var(--ink-soft);
+  font-size: 17px; line-height: 1;
+  padding: 0 4px;
+  opacity: .4;
+}
+
+.events__add {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  background: none;
+  color: var(--ink-soft);
+  font-size: 15px;
+}
+
+.events__form {
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--frame);
+}
+
+.events__row { display: flex; gap: 8px; }
+
+.events__form input {
+  font-size: 16px;
+  font-family: var(--sans);
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.events__emoji { width: 58px; text-align: center; }
+.events__title { flex: 1; min-width: 0; }
+
+.events__field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.events__optional { font-size: 12px; opacity: .8; }
+
+.events__check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.events__check input { width: 18px; height: 18px; accent-color: var(--rose); }
+
+.events__actions { display: flex; gap: 10px; margin-top: 14px; }
+
+.events__actions button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: var(--rose);
+  color: var(--frame);
+  font-size: 15px;
+}
+
+.events__actions button:disabled { background: var(--line); color: var(--ink-soft); }
+
+.events__ghost { background: none !important; color: var(--ink-soft) !important; border: 1px solid var(--line) !important; }
+
 /* ---------- griglia ---------- */
 
 .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 7px; }
@@ -214,6 +361,18 @@ button { font-family: inherit; cursor: pointer; }
   line-height: 1;
   opacity: .6;
 }
+
+.cell__event {
+  position: absolute;
+  top: 3px; left: 5px;
+  z-index: 1;
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* Un giorno segnato porta una riga sotto il numero; se è un incontro, dorata. */
+.cell--event { border-bottom-width: 3px; border-bottom-color: var(--line); }
+.cell--meetup { border-bottom-width: 3px; border-bottom-color: var(--gold); }
 
 /* ---------- vista giorno ---------- */
 

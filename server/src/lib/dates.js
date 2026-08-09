@@ -35,6 +35,14 @@ export function isUploadOpen(date, now = new Date()) {
   return date <= today && date >= shiftDate(today, -WINDOW_DAYS);
 }
 
+export function daysBetween(from, to) {
+  const toUtc = (date) => {
+    const [y, m, d] = date.split('-').map(Number);
+    return Date.UTC(y, m - 1, d);
+  };
+  return Math.round((toUtc(to) - toUtc(from)) / 86400000);
+}
+
 export function isLate(date, uploadedAt) {
   if (!uploadedAt) return false;
   return romeDate(uploadedAt) > date;
