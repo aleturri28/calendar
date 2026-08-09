@@ -3,8 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Neon serve una connessione diretta per le migrazioni, mentre l'app usa
+  // quella con pooling. In locale le due coincidono.
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model User {

@@ -24,7 +24,8 @@ Solo 2 utenti fissi. Niente registrazione, niente feed, niente like.
 | Video sotto il minimo | Upload bloccato, non un avviso. |
 | Fuso orario | `Europe/Rome` fisso per entrambi (Italia e Palma sono nello stesso fuso). |
 | Eventi | Singoli e multi-giorno, con flag `isMeetup` e countdown al prossimo incontro. |
-| Hosting | Railway, servizio unico, volume persistente. |
+| Hosting | Vercel Hobby, con le API come funzione serverless unica. |
+| Database | Postgres su Neon (free tier). |
 | Upload | Diretto browser → Cloudinary con firma; il server verifica a posteriori. |
 | Sessione | JWT in cookie `httpOnly`, 180 giorni. |
 
@@ -42,8 +43,10 @@ completo (palette/polaroid).
 
 ## Architettura
 
-Un solo servizio: Express serve le API sotto `/api` e il build statico di React per
-tutto il resto. Nessun CORS, un solo dominio, un solo deploy.
+Un solo dominio: su Vercel il build di React è servito dalla CDN come sito statico,
+mentre tutto ciò che sta sotto `/api` viene riscritto su una singola funzione
+serverless che è l'app Express. Nessun CORS, un solo deploy. In locale lo stesso
+Express serve anche i file statici, così `npm start` riproduce la produzione.
 
 ```
 calendar/
@@ -63,15 +66,20 @@ calendar/
     seed.js
 ```
 
-In produzione il volume Railway è montato su `/data` e `DATABASE_URL=file:/data/app.db`,
-così il database sopravvive ai deploy. In locale è `file:./dev.db`.
+In produzione `DATABASE_URL` punta alla connessione con pooling di Neon, mentre
+`DIRECT_DATABASE_URL` è quella diretta, usata solo dalle migrazioni. In locale entrambe
+puntano a un Postgres sulla macchina (`calendar_dev`), e i test usano un database
+separato (`calendar_test`).
 
-### Perché non Vercel
+### Perché non SQLite su disco
 
-Il filesystem delle serverless function è effimero: un file SQLite lì viene perso a ogni
-deploy. In più il limite di 4.5MB sul body di una request rende impossibile qualunque
-upload che passi dal backend, e i video da iPhone pesano decine o centinaia di MB.
-Railway con volume risolve entrambi senza aggiungere servizi esterni.
+Il piano iniziale prevedeva SQLite su un volume Railway. Railway ha però tolto il piano
+gratuito, e nessun hosting gratuito offre un disco persistente: il filesystem delle
+funzioni serverless è effimero, quindi un file `.db` sparirebbe a ogni deploy. Il
+database deve stare fuori dal filesystem, e Neon lo fornisce gratis con Postgres.
+
+Il limite di 4.5MB sul body di una request su Vercel non ci riguarda: i file non passano
+mai dal backend, vanno dal browser direttamente a Cloudinary.
 
 ## Modello dati
 
@@ -189,7 +197,9 @@ produzione, scadenza 180 giorni — copre l'intero percorso senza mai rifare log
 
 ## Test
 
-Vitest + supertest sulle route, Cloudinary mockato, SQLite su file temporaneo per test.
+Vitest + supertest sulle route, Cloudinary mockato, database Postgres `calendar_test`
+separato da quello di sviluppo — stesso motore della produzione, così le differenze di
+dialetto emergono nei test e non in produzione.
 
 Priorità ai casi dove un bug fa danno silenzioso:
 
@@ -207,7 +217,8 @@ Sul client, uno smoke test sul rendering degli stati della griglia.
 | Variabile | Note |
 |---|---|
 | `CLOUDINARY_URL` | già presente |
-| `DATABASE_URL` | già presente; in produzione `file:/data/app.db` |
+| `DATABASE_URL` | Postgres; in produzione la connessione con pooling di Neon |
+| `DIRECT_DATABASE_URL` | Postgres senza pooling, solo per le migrazioni |
 | `JWT_SECRET` | già presente |
 | `USER_A_NAME`, `USER_A_PASSWORD` | account 1 |
 | `USER_B_NAME`, `USER_B_PASSWORD` | account 2 |
