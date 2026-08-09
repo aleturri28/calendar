@@ -31,5 +31,14 @@ export async function uploadToCloudinary(file, signature) {
 
   const url = `https://api.cloudinary.com/v1_1/${signature.cloudName}/${signature.resourceType}/upload`;
   const res = await fetch(url, { method: 'POST', body: form });
-  if (!res.ok) throw new Error('upload_failed');
+
+  if (!res.ok) {
+    // Il messaggio di Cloudinary dice cosa è andato storto davvero (chiave
+    // sbagliata, firma scaduta, formato non supportato): perderlo qui
+    // significa mostrare "riprova" per un problema che nessun retry risolve.
+    const body = await res.json().catch(() => null);
+    const error = new Error('upload_failed');
+    error.detail = body?.error?.message ?? `HTTP ${res.status}`;
+    throw error;
+  }
 }

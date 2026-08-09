@@ -35,6 +35,8 @@ export function UploadSlot({ date, kind, url, minDuration, disabled, onDone }) {
         setError(`Servono almeno ${err.data.minDuration}s, questo dura ${Math.round(err.data.duration)}s`);
       } else if (err.data?.error === 'window_closed') {
         setError('Questo giorno è chiuso');
+      } else if (err.detail) {
+        setError(`Caricamento fallito: ${err.detail}`);
       } else {
         setError('Caricamento fallito, riprova');
       }
