@@ -1,16 +1,22 @@
 // Widget Scriptable per il calendario condiviso.
 //
+// Mostra l'ultima foto caricata dall'ALTRA persona: sul telefono di Alessandro
+// compare Anna, su quello di Anna compare Alessandro. Legge soltanto, non
+// scatta e non carica niente.
+//
 // Installazione, una volta per iPhone:
 //  1. installa Scriptable dall'App Store;
-//  2. crea un nuovo script, incolla questo file;
-//  3. sostituisci BASE_URL e TOKEN qui sotto con i tuoi;
+//  2. crea un nuovo script e incolla questo file;
+//  3. metti il tuo nome in IO e il token in TOKEN, qui sotto;
 //  4. tieni premuto sulla schermata home → aggiungi widget → Scriptable,
 //     e scegli questo script.
-//
-// Il widget legge soltanto: mostra la foto già caricata oggi. Non scatta
-// niente e non carica niente.
 
 const BASE_URL = 'https://nostro-calendario.vercel.app';
+
+// Il TUO nome, esattamente come compare nell'app. Sul telefono dell'altra
+// persona va messo l'altro nome: è ciò che rende il widget speculare.
+const IO = 'Alessandro';
+
 // Il valore è nel file .env del progetto, alla riga WIDGET_TOKEN.
 const TOKEN = 'INCOLLA-QUI-IL-WIDGET_TOKEN';
 
@@ -18,55 +24,74 @@ const PAPER = new Color('#f7f0e4');
 const INK = new Color('#3b3128');
 const SOFT = new Color('#857566');
 
+const MESI = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu',
+  'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+
+function giornoLeggibile(date) {
+  const [, mese, giorno] = date.split('-');
+  return `${Number(giorno)} ${MESI[Number(mese) - 1]}`;
+}
+
+function messaggio(widget, testo) {
+  const line = widget.addText(testo);
+  line.textColor = SOFT;
+  line.font = Font.systemFont(12);
+  line.centerAlignText();
+}
+
 async function build() {
   const widget = new ListWidget();
   widget.backgroundColor = PAPER;
   widget.setPadding(12, 12, 12, 12);
+  widget.url = BASE_URL;
+  // Il widget iOS si aggiorna quando vuole lui: mezz'ora è solo un suggerimento.
+  widget.refreshAfterDate = new Date(Date.now() + 30 * 60 * 1000);
 
   let data;
   try {
-    const request = new Request(`${BASE_URL}/api/widget/today?token=${encodeURIComponent(TOKEN)}`);
-    data = await request.loadJSON();
+    const url = `${BASE_URL}/api/widget/latest`
+      + `?token=${encodeURIComponent(TOKEN)}&as=${encodeURIComponent(IO)}`;
+    data = await new Request(url).loadJSON();
   } catch (error) {
-    const line = widget.addText('Non raggiungibile');
-    line.textColor = SOFT;
-    line.font = Font.systemFont(12);
+    messaggio(widget, 'Non raggiungibile');
     return widget;
   }
 
+  if (data.error === 'bad_token') {
+    messaggio(widget, 'Token non valido');
+    return widget;
+  }
+  if (data.error === 'unknown_viewer' || data.error === 'missing_viewer') {
+    messaggio(widget, `Nome "${IO}" non riconosciuto`);
+    return widget;
+  }
   if (data.error) {
-    const line = widget.addText(data.error === 'bad_token' ? 'Token non valido' : 'Widget spento');
-    line.textColor = SOFT;
-    line.font = Font.systemFont(12);
+    messaggio(widget, 'Widget spento');
     return widget;
   }
 
-  // Preferisce la foto dell'altro: il widget serve a vedere lei, non te.
-  const withPhoto = data.people.filter((p) => p.thumb);
-  const chosen = withPhoto[withPhoto.length - 1] ?? null;
-
-  if (!chosen) {
-    const title = widget.addText('Oggi ancora niente');
+  if (!data.hasPhoto) {
+    const title = widget.addText(`${data.from} non ha ancora caricato`);
     title.textColor = INK;
-    title.font = Font.mediumSystemFont(14);
-    widget.addSpacer(4);
-    const hint = widget.addText('Tocca per aggiungere la tua foto');
-    hint.textColor = SOFT;
-    hint.font = Font.systemFont(11);
-  } else {
-    const image = await new Request(chosen.thumb).loadImage();
-    const view = widget.addImage(image);
-    view.cornerRadius = 6;
-    view.applyFillingContentMode();
-
-    widget.addSpacer(6);
-    const caption = widget.addText(chosen.name);
-    caption.textColor = SOFT;
-    caption.font = Font.systemFont(11);
+    title.font = Font.mediumSystemFont(13);
+    title.centerAlignText();
+    return widget;
   }
 
-  widget.url = BASE_URL;
-  widget.refreshAfterDate = new Date(Date.now() + 30 * 60 * 1000);
+  const image = await new Request(data.thumb).loadImage();
+  const view = widget.addImage(image);
+  view.cornerRadius = 6;
+  view.applyFillingContentMode();
+
+  widget.addSpacer(6);
+
+  const caption = widget.addText(
+    data.isToday ? `${data.from} · oggi` : `${data.from} · ${giornoLeggibile(data.date)}`
+  );
+  caption.textColor = SOFT;
+  caption.font = Font.systemFont(11);
+  caption.centerAlignText();
+
   return widget;
 }
 
